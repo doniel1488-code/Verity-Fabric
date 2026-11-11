@@ -1,0 +1,32 @@
+name: Build Verity Fabric
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '8.14.3'
+      - name: Extract source archive
+        run: |
+          mkdir -p .build-src
+          tar -xJf source/Verity-Fabric-source.tar.xz -C .build-src
+      - name: Build remapped mod
+        run: gradle --no-daemon -p .build-src/VerityFabric clean build
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Verity-Fabric-Minecraft-1.21.8
+          path: .build-src/VerityFabric/build/libs/verity-fabric-*.jar
+          if-no-files-found: error
+          retention-days: 30
