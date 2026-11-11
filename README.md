@@ -1,41 +1,63 @@
 # Verity — Fabric 1.21.8
 
-AI companion / horror prototype for Minecraft Java 1.21.8 (Fabric).
+Неофициальная самостоятельная реализация ИИ-спутника Verity для Minecraft Java Edition 1.21.8 + Fabric.
 
-## Source
-The full Gradle project is stored in `source/parts/` as ordered XZ archive chunks. GitHub Actions joins them before building. For a local copy:
+## Исходники
 
-```bash
-cat source/parts/part-*.xz > Verity-Fabric-source.tar.xz
+Gradle-проект хранится в каталоге `source/` как несколько Base64-частей одного XZ-архива. GitHub Actions собирает их в архив и распаковывает перед компиляцией.
+
+### Восстановление исходников в Windows PowerShell
+
+```powershell
+$b64 = (Get-ChildItem source/verity-source-part-*.b64 | Sort-Object Name | Get-Content -Raw) -join ""
+[IO.File]::WriteAllBytes("Verity-Fabric-source.tar.xz", [Convert]::FromBase64String(($b64 -replace "\\s", "")))
 tar -xJf Verity-Fabric-source.tar.xz
 ```
 
-## Build
-Requirements: JDK 21 and Gradle 8.14.3.
+### Linux / macOS / Git Bash
 
 ```bash
+cat source/verity-source-part-*.b64 | base64 --decode > Verity-Fabric-source.tar.xz
+xz -t Verity-Fabric-source.tar.xz
+tar -xJf Verity-Fabric-source.tar.xz
+```
+
+После распаковки открой каталог `VerityFabric`.
+
+## Сборка
+
+Требуются JDK 21 и Gradle 8.14.3.
+
+```bash
+cd VerityFabric
 gradle --no-daemon clean build
 ```
 
-The remapped JAR is created in `build/libs/verity-fabric-0.1.0.jar`.
+Готовый remapped JAR: `build/libs/verity-fabric-0.1.0.jar`.
 
-## Install and configure
-1. Install Fabric Loader for Minecraft 1.21.8 and Fabric API.
-2. Download the JAR from a successful Actions run artifact or a GitHub Release.
-3. Put the JAR in `.minecraft/mods`.
-4. Launch once, close Minecraft, then edit `.minecraft/config/verity-fabric.json`.
-5. Set your own Groq API key in `apiKey`. The default model is `openai/gpt-oss-20b`.
+## Установка и настройка ИИ
 
-The API key is read locally at runtime. It is not included in the repository or JAR. Do not commit your config file or share your key publicly.
+1. Установи Fabric Loader для Minecraft 1.21.8 и Fabric API соответствующей версии.
+2. Скачай JAR из Actions artifact успешной сборки или из GitHub Releases.
+3. Помести JAR в `.minecraft/mods`.
+4. Запусти игру один раз и закрой её.
+5. Открой `.minecraft/config/verity-fabric.json` и заполни `apiKey` собственным ключом Groq.
 
-## In game
-- Use a Verity Box on a block to summon the companion.
-- Press `V` near Verity to open the AI chat.
-- Feed Verity a golden carrot to restore trust.
-- At low trust the companion becomes hostile (can be disabled in the config).
+По умолчанию используется OpenAI-совместимый endpoint Groq и модель `openai/gpt-oss-20b`.
 
-## Status
-Early prototype. GitHub Actions is the compile check; the mod still needs playtesting in Minecraft 1.21.8.
+**API-ключ не вшит в исходники, JAR или репозиторий.** Не публикуй конфиг с ключом, не отправляй его в issues и не добавляй в Git.
 
-## License
-MIT. This is an independent implementation and is not affiliated with the original Verity creator.
+## Управление
+
+- Используй предмет **Коробка Verity** по блоку, чтобы призвать спутника.
+- Нажми **V** рядом с Verity, чтобы открыть ИИ-чат.
+- Покорми Verity золотой морковью, чтобы восстановить доверие.
+- При низком доверии спутник может стать агрессивным; эту механику можно выключить в конфиге.
+
+## Статус
+
+Ранний прототип. GitHub Actions проверяет компиляцию; поведение сущности, рендеринг и игровой баланс требуют тестирования непосредственно в Minecraft 1.21.8. Пока CI не завершился успешно, не считай JAR проверенным релизом.
+
+## Лицензия
+
+MIT. Это независимая реализация, не связанная с создателем оригинальной Verity.
