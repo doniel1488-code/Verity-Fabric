@@ -104,11 +104,12 @@ gradle --no-daemon clean build
 cat source/v0.2.0/verified-chunks/part-*.b64 | base64 --decode > Verity-Fabric-source.tar.xz
 xz -t Verity-Fabric-source.tar.xz
 tar -xJf Verity-Fabric-source.tar.xz
+git apply source/patches/0002-fix-item-registry-key.patch
 cd VerityFabric
 gradle --no-daemon clean build
 ```
 
-Готовый JAR: `build/libs/verity-fabric-0.2.0.jar`.
+Готовый JAR: `build/libs/verity-fabric-0.2.1.jar`.
 
 ## Автоматические проверки
 
