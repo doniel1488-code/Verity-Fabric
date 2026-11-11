@@ -1,51 +1,70 @@
 name: Release Verity Fabric
 
 on:
-  workflow_run:
-    workflows: ["Build Verity Fabric"]
-    types: [completed]
-    branches: [main]
+  push:
+    tags:
+      - 'v*'
 
 permissions:
-  actions: read
   contents: write
 
 jobs:
   release:
-    if: github.event.workflow_run.conclusion == 'success'
+    name: Build and publish tagged Verity release
     runs-on: ubuntu-latest
     steps:
-      - name: Download verified JAR from the successful build
-        uses: actions/download-artifact@v7
+      - name: Checkout tagged source
+        uses: actions/checkout@v6
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v5
         with:
-          name: Verity-Fabric-Minecraft-1.21.8
-          repository: ${{ github.repository }}
-          run-id: ${{ github.event.workflow_run.id }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path: dist
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Gradle 8.14.3
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '8.14.3'
+
+      - name: Restore and validate source archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .build-src
+          cat source/v0.2.0/verified-chunks/part-*.b64 | base64 --decode > /tmp/verity-fabric-source.tar.xz
+          xz -t /tmp/verity-fabric-source.tar.xz
+          tar -xJf /tmp/verity-fabric-source.tar.xz -C .build-src
+          test -f .build-src/VerityFabric/build.gradle
+          python .build-src/VerityFabric/scripts/verify_resources.py --project .build-src/VerityFabric
+
+      - name: Build remapped mod
+        run: gradle --no-daemon -p .build-src/VerityFabric clean build
+
+      - name: Verify packaged JAR
+        shell: bash
+        run: |
+          set -euo pipefail
+          JAR=".build-src/VerityFabric/build/libs/verity-fabric-0.2.0.jar"
+          test -f "$JAR"
+          python .build-src/VerityFabric/scripts/verify_resources.py --jar "$JAR"
+          mkdir -p dist
+          cp "$JAR" dist/
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.2.0
-          target_commitish: ${{ github.event.workflow_run.head_sha }}
-          name: "Verity 0.2.0 — Minecraft 1.21.8"
+          tag_name: ${{ github.ref_name }}
+          name: "Verity ${{ github.ref_name }} — Minecraft 1.21.8"
           body: |
-            ## Verity 0.2.0 — Fabric 1.21.8
+            ## Verity ${{ github.ref_name }} — Fabric 1.21.8
 
-            Предварительный релиз. Сборка прошла CI-компиляцию, remap и проверку упакованных ресурсов.
+            Предварительный релиз. Сборка прошла компиляцию, remap и проверку ресурсов до и после упаковки в JAR.
 
-            ### Включено
-            - Русская локализация интерфейса и английский резервный перевод.
-            - Иконка мода, текстура обычной Verity и хоррор-формы.
-            - Текстура и модель Коробки Verity.
-            - Четыре звуковых файла и регистрация звуковых событий.
-            - Рецепт крафта Коробки Verity.
-            - Диалог с ИИ через Groq API.
+            В JAR входят русская и английская локализации, иконка мода, обычная и хоррор-текстуры, модель и текстура Коробки Verity, рецепт и четыре OGG-звука.
 
-            Требуется Minecraft Java 1.21.8, Fabric Loader и Fabric API для 1.21.8, Java 21.
-            Игровое тестирование на клиенте ещё требуется.
-          files: dist/verity-fabric-*.jar
+            Требуется Minecraft Java 1.21.8, Fabric Loader, Fabric API для 1.21.8 и Java 21.
+            Игровое тестирование непосредственно на клиенте Minecraft остаётся необходимым.
+          files: dist/verity-fabric-0.2.0.jar
           fail_on_unmatched_files: true
-          overwrite_files: true
           prerelease: true
