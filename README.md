@@ -4,7 +4,6 @@
 
 ## Статус сборки
 
-<badge>Да, нужно plain Markdown, keep simple</badge>
 
 **CI build прошёл успешно:** [GitHub Actions #19](https://github.com/doniel1488-code/Verity-Fabric/actions/runs/43055005795). JAR и sources JAR доступны в Artifacts этого запуска. Сборка выполнена на Java 21 и прошла Gradle compile/remap. Игровой тест в клиенте Minecraft ещё не проводился.
 
