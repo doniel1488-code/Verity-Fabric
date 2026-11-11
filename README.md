@@ -1,28 +1,28 @@
 # Verity — Minecraft Java 1.21.8 · Fabric
 
-Неофициальный Fabric-мод с ИИ-спутником Verity. В обычной форме он дружелюбен к владельцу, следует за ним и общается через отдельное окно чата. При низком доверии меняет внешний вид и может атаковать владельца.
+Неофициальный Fabric-мод с ИИ-спутником Verity. В обычной форме он дружелюбен к владельцу, следует за ним и общается через отдельный чат. При низком доверии меняет внешний вид и может стать агрессивным.
 
 ## Скачать
 
 **[GitHub Release — Verity 0.2.0](https://github.com/doniel1488-code/Verity-Fabric/releases/tag/v0.2.0)**
 
-Release публикуется автоматически только после успешной компиляции, remap и проверки всех обязательных ресурсов внутри JAR. Пока Release не появился, открой [GitHub Actions](https://github.com/doniel1488-code/Verity-Fabric/actions) и скачай артефакт успешной сборки.
+Прямой файл: [verity-fabric-0.2.0.jar](https://github.com/doniel1488-code/Verity-Fabric/releases/download/v0.2.0/verity-fabric-0.2.0.jar).
 
 ## Требования
 
 - Minecraft Java Edition **1.21.8**.
 - Fabric Loader **0.17.2** или совместимый.
-- Fabric API для Minecraft 1.21.8.
+- Fabric API для Minecraft **1.21.8**.
 - Java **21**.
 - Собственный API-ключ Groq для ИИ-чата.
-- Для мультиплеера мод должен стоять и на Fabric-сервере, и у клиентов. Paper/Spigot не поддерживаются.
+- Для мультиплеера мод должен стоять на Fabric-сервере и у клиентов. Paper/Spigot не поддерживаются.
 
 ## Ресурсы мода
 
-В JAR входят все необходимые ресурсы:
+В релизный JAR включены и автоматически проверены:
 
 - Иконка Verity в списке модов Fabric.
-- Текстура обычной Verity и отдельная текстура хоррор-формы.
+- Обычная и хоррор-текстуры сущности.
 - Модель и текстура Коробки Verity.
 - Рецепт крафта Коробки Verity.
 - Четыре OGG-звука: обычное окружение, хоррор-окружение, получение урона и призыв.
@@ -30,17 +30,17 @@ Release публикуется автоматически только посл�
 
 ## Язык интерфейса
 
-Мод использует язык, выбранный в Minecraft. Для русского интерфейса открой **Настройки → Язык → Русский**. При выбранном английском языке Minecraft будет использовать перевод `en_us`.
+Мод использует язык, выбранный в самом Minecraft. Для русского интерфейса открой **Настройки → Язык → Русский**. При выбранном английском языке Minecraft использует `en_us`.
 
 ## Установка
 
 1. Установи Fabric Loader для Minecraft 1.21.8.
 2. Установи Fabric API для Minecraft 1.21.8.
-3. Скачай `verity-fabric-0.2.0.jar` из [Releases](https://github.com/doniel1488-code/Verity-Fabric/releases/tag/v0.2.0).
-4. Положи JAR в `.minecraft/mods`.
+3. Скачай JAR из раздела [Releases](https://github.com/doniel1488-code/Verity-Fabric/releases/tag/v0.2.0).
+4. Положи его в `.minecraft/mods`.
 5. Запусти игру один раз, чтобы мод создал конфигурацию.
-6. Выбери русский язык Minecraft, если хочешь русский интерфейс.
-7. Открой `.minecraft/config/verity-fabric.json`, укажи свой Groq API-ключ в поле `apiKey`, сохрани файл и перезапусти игру.
+6. Выбери русский язык Minecraft, если нужен русский интерфейс.
+7. Открой `.minecraft/config/verity-fabric.json`, укажи собственный Groq API-ключ в поле `apiKey`, сохрани файл и перезапусти игру.
 
 ## Управление
 
@@ -79,19 +79,30 @@ Release публикуется автоматически только посл�
 }
 ```
 
-Вставь свой ключ в `apiKey`. Ключ не включён в репозиторий или JAR и хранится только в локальном конфиге. Не публикуй конфиг с заполненным ключом. Доступность модели и ограничения запросов зависят от текущего аккаунта Groq.
+Вставь свой ключ в `apiKey`. Ключ не включён в репозиторий или JAR и хранится только в локальном конфиге. Не публикуй конфиг с заполненным ключом.
 
 ## Сборка из исходников
 
-Нужны JDK 21 и Gradle 8.14.3. Исходный проект хранится в `source/v0.2.0/chunks/` как части XZ-архива. После распаковки примени compatibility patch из `source/patches/0001-fix-1218-item-tooltip.patch` — он удаляет устаревший tooltip override, несовместимый с 1.21.8.
+Нужны JDK 21 и Gradle 8.14.3.
 
-Linux / macOS / Git Bash:
+### Windows PowerShell
+
+Из корня репозитория:
+
+```powershell
+$b64 = (Get-ChildItem "source/v0.2.0/verified-chunks/part-*.b64" | Sort-Object Name | Get-Content -Raw) -join ""
+[IO.File]::WriteAllBytes("Verity-Fabric-source.tar.xz", [Convert]::FromBase64String($b64))
+tar -xJf Verity-Fabric-source.tar.xz
+cd VerityFabric
+gradle --no-daemon clean build
+```
+
+### Linux / macOS / Git Bash
 
 ```bash
-cat source/v0.2.0/chunks/part-*.b64 | base64 --decode > Verity-Fabric-source.tar.xz
+cat source/v0.2.0/verified-chunks/part-*.b64 | base64 --decode > Verity-Fabric-source.tar.xz
 xz -t Verity-Fabric-source.tar.xz
 tar -xJf Verity-Fabric-source.tar.xz
-patch -p1 -d VerityFabric < source/patches/0001-fix-1218-item-tooltip.patch
 cd VerityFabric
 gradle --no-daemon clean build
 ```
@@ -100,11 +111,11 @@ gradle --no-daemon clean build
 
 ## Автоматические проверки
 
-GitHub Actions восстанавливает исходники, применяет 1.21.8 patch, проверяет локализации, PNG-текстуры, модель предмета, рецепт и OGG-звуки, затем компилирует и remap-ит мод. После сборки те же проверки выполняются уже внутри JAR. Только после успешного результата запускается публикация GitHub Release.
+GitHub Actions восстанавливает исходники, проверяет локализации, PNG-текстуры, модель предмета, рецепт и OGG-звуки, затем компилирует и remap-ит мод. После сборки те же проверки выполняются уже внутри JAR. Публикация будущих релизов запускается только по Git-тегу `v*`, чтобы не пытаться перезаписывать существующий Release при каждом push в `main`.
 
 ## Статус
 
-**0.2.0 — предварительный релиз.** Компиляция и проверка ресурсов автоматизированы. Призыв, следование, хоррор-поведение, звуки и реальные запросы Groq нужно дополнительно проверить непосредственно в клиенте Minecraft 1.21.8.
+**0.2.0 — предварительный релиз.** Компиляция и проверка ресурсов прошли в GitHub Actions. Поведение сущности, анимации и реальные запросы Groq необходимо дополнительно протестировать непосредственно в клиенте Minecraft 1.21.8.
 
 ## Лицензия
 
