@@ -2,6 +2,12 @@
 
 Неофициальная самостоятельная реализация ИИ-спутника Verity для Minecraft Java Edition 1.21.8 + Fabric.
 
+## Статус сборки
+
+<badge>Да, нужно plain Markdown, keep simple</badge>
+
+**CI build прошёл успешно:** [GitHub Actions #19](https://github.com/doniel1488-code/Verity-Fabric/actions/runs/43055005795). JAR и sources JAR доступны в Artifacts этого запуска. Сборка выполнена на Java 21 и прошла Gradle compile/remap. Игровой тест в клиенте Minecraft ещё не проводился.
+
 ## Исходники
 
 Gradle-проект хранится в каталоге `source/` как несколько Base64-частей одного XZ-архива. GitHub Actions собирает их в архив и распаковывает перед компиляцией.
@@ -38,7 +44,7 @@ gradle --no-daemon clean build
 ## Установка и настройка ИИ
 
 1. Установи Fabric Loader для Minecraft 1.21.8 и Fabric API соответствующей версии.
-2. Скачай JAR из Actions artifact успешной сборки или из GitHub Releases.
+2. Скачай JAR из [успешного Actions run](https://github.com/doniel1488-code/Verity-Fabric/actions/runs/43055005795) → Artifacts → `Verity-Fabric-Minecraft-1.21.8`.
 3. Помести JAR в `.minecraft/mods`.
 4. Запусти игру один раз и закрой её.
 5. Открой `.minecraft/config/verity-fabric.json` и заполни `apiKey` собственным ключом Groq.
@@ -53,10 +59,6 @@ gradle --no-daemon clean build
 - Нажми **V** рядом с Verity, чтобы открыть ИИ-чат.
 - Покорми Verity золотой морковью, чтобы восстановить доверие.
 - При низком доверии спутник может стать агрессивным; эту механику можно выключить в конфиге.
-
-## Статус
-
-Ранний прототип. GitHub Actions проверяет компиляцию; поведение сущности, рендеринг и игровой баланс требуют тестирования непосредственно в Minecraft 1.21.8. Пока CI не завершился успешно, не считай JAR проверенным релизом.
 
 ## Лицензия
 
