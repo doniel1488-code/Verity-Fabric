@@ -51,6 +51,7 @@ jobs:
             | base64 --decode > /tmp/verity-source.tar.xz
           xz -t /tmp/verity-source.tar.xz
           tar -xJf /tmp/verity-source.tar.xz -C .build-src
+          patch -p1 -d .build-src/VerityFabric < source/patches/0001-fix-1218-item-tooltip.patch
           test -f .build-src/VerityFabric/build.gradle
           test -f .build-src/VerityFabric/scripts/verify_resources.py
           python .build-src/VerityFabric/scripts/verify_resources.py --project .build-src/VerityFabric
