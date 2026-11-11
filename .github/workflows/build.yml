@@ -18,10 +18,12 @@ jobs:
       - uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: '8.14.3'
-      - name: Extract source archive
+      - name: Restore source archive
         run: |
           mkdir -p .build-src
-          tar -xJf source/Verity-Fabric-source.tar.xz -C .build-src
+          cat source/parts/part-*.xz > /tmp/Verity-Fabric-source.tar.xz
+          xz -t /tmp/Verity-Fabric-source.tar.xz
+          tar -xJf /tmp/Verity-Fabric-source.tar.xz -C .build-src
       - name: Build remapped mod
         run: gradle --no-daemon -p .build-src/VerityFabric clean build
       - uses: actions/upload-artifact@v7
