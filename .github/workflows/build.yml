@@ -28,7 +28,7 @@ jobs:
         with:
           gradle-version: '8.14.3'
 
-      - name: Restore and verify Verity 0.2.0 source archive
+      - name: Restore base Verity 0.2.0 source archive
         shell: bash
         run: |
           set -euo pipefail
@@ -64,6 +64,6 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: Verity-Fabric-Minecraft-1.21.8-v0.2.1
-          path: dist/verity-fabric-0.2.0.jar
+          path: dist/verity-fabric-0.2.1.jar
           if-no-files-found: error
           retention-days: 90
