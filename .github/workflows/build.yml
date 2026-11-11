@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   build:
-    name: Verity 0.2.0 / Minecraft 1.21.8 / Fabric
+    name: Verity 0.2.1 / Minecraft 1.21.8 / Fabric
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -38,6 +38,13 @@ jobs:
           tar -xJf /tmp/verity-fabric-0.2.0.tar.xz -C .build-src
           test -f .build-src/VerityFabric/build.gradle
           test -f .build-src/VerityFabric/scripts/verify_resources.py
+          test -f .build-src/VerityFabric/src/main/java/ru/governix/verity/VerityMod.java
+
+      - name: Apply Verity 0.2.1 item-registration fix and validate source
+        shell: bash
+        run: |
+          set -euo pipefail
+          patch --batch --forward -p1 -d .build-src < source/patches/0002-fix-item-registry-key.patch
           python .build-src/VerityFabric/scripts/verify_resources.py --project .build-src/VerityFabric
 
       - name: Build remapped mod
@@ -47,7 +54,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR=".build-src/VerityFabric/build/libs/verity-fabric-0.2.0.jar"
+          JAR=".build-src/VerityFabric/build/libs/verity-fabric-0.2.1.jar"
           test -f "$JAR"
           python .build-src/VerityFabric/scripts/verify_resources.py --jar "$JAR"
           mkdir -p dist
@@ -56,7 +63,7 @@ jobs:
       - name: Upload release JAR
         uses: actions/upload-artifact@v7
         with:
-          name: Verity-Fabric-Minecraft-1.21.8
+          name: Verity-Fabric-Minecraft-1.21.8-v0.2.1
           path: dist/verity-fabric-0.2.0.jar
           if-no-files-found: error
           retention-days: 90
