@@ -1,63 +1,104 @@
-# Verity — Fabric 1.21.8
+# Verity — Minecraft 1.21.8 · Fabric
 
-Неофициальная самостоятельная реализация ИИ-спутника Verity для Minecraft Java Edition 1.21.8 + Fabric.
+Клиентско-серверный Fabric-мод с ИИ-спутником Verity, диалогом через Groq API и постепенным переходом к хоррор-поведению.
 
-## Статус сборки
+## Скачать
 
+**[Релиз Verity 0.2.0](https://github.com/doniel1488-code/Verity-Fabric/releases/tag/v0.2.0)**
 
-**CI build прошёл успешно:** [GitHub Actions #19](https://github.com/doniel1488-code/Verity-Fabric/actions/runs/43055005795). JAR и sources JAR доступны в Artifacts этого запуска. Сборка выполнена на Java 21 и прошла Gradle compile/remap. Игровой тест в клиенте Minecraft ещё не проводился.
+JAR прикрепляется к релизу автоматически после успешной сборки и проверки ресурсов в GitHub Actions. Пока релиз не опубликован, смотри [сборки Actions](https://github.com/doniel1488-code/Verity-Fabric/actions).
 
-## Исходники
+## Требования
 
-Gradle-проект хранится в каталоге `source/` как несколько Base64-частей одного XZ-архива. GitHub Actions собирает их в архив и распаковывает перед компиляцией.
+- Minecraft Java Edition **1.21.8**.
+- Fabric Loader **0.17.2** или совместимее.
+- Fabric API для Minecraft 1.21.8.
+- Java **21**.
+- Собственный API-ключ Groq для ИИ-диалога.
+- Для мультиплеера мод должен быть установлен на Fabric-сервере и клиентах. Paper/Spigot не поддерживаются.
 
-### Восстановление исходников в Windows PowerShell
+## Возможности и ресурсы
 
-```powershell
-$b64 = (Get-ChildItem source/verity-source-part-*.b64 | Sort-Object Name | Get-Content -Raw) -join ""
-[IO.File]::WriteAllBytes("Verity-Fabric-source.tar.xz", [Convert]::FromBase64String(($b64 -replace "\\s", "")))
-tar -xJf Verity-Fabric-source.tar.xz
+- Сущность Verity с обычной и хоррор-текстурой.
+- Иконка мода и собственная текстура Коробки Verity.
+- Модель предмета Коробки Verity и рецепт крафта.
+- Четыре OGG-звука: обычное окружение, окружение хоррор-формы, урон и призыв.
+- Полная русская локализация `ru_ru`; английский перевод `en_us` используется как резервный.
+- Следование за владельцем, сохранение владельца и уровня доверия.
+- Диалоговое окно с памятью последних сообщений и контекстом мира.
+- Ответы ИИ через OpenAI-совместимый Groq API.
+- При доверии 20/100 и ниже Verity меняется и становится опасным. Эту механику можно отключить в конфиге.
+
+## Установка
+
+1. Установи Fabric Loader для Minecraft 1.21.8.
+2. Установи Fabric API для Minecraft 1.21.8.
+3. Скачай `verity-fabric-0.2.0.jar` из [Releases](https://github.com/doniel1488-code/Verity-Fabric/releases/tag/v0.2.0).
+4. Положи JAR в папку `.minecraft/mods`.
+5. Запусти игру один раз, чтобы мод создал конфигурацию.
+6. В настройках Minecraft выбери язык **Русский**, чтобы интерфейс мода отображался на русском.
+7. Открой `.minecraft/config/verity-fabric.json`, укажи собственный Groq API-ключ в поле `apiKey`, сохрани файл и перезапусти игру.
+
+## Управление
+
+| Действие | Как выполнить |
+|---|---|
+| Призвать Verity | Используй Коробку Verity по блоку |
+| Открыть диалог | Нажми `V`, находясь рядом с Verity |
+| Отправить сообщение | `Enter` |
+| Закрыть диалог | `Esc` |
+| Восстановить доверие | Покорми Verity золотой морковью |
+
+## Рецепт Коробки Verity
+
+В верстаке:
+
+```text
+  Золотой слиток
+Золотой слиток  Аметист  Золотой слиток
+  Редстоун
 ```
 
-### Linux / macOS / Git Bash
+Рецепт также хранится в `data/verity/recipe/verity_box.json`.
+
+## Настройка ИИ
+
+После первого запуска появится файл `.minecraft/config/verity-fabric.json`:
+
+```json
+{
+  "provider": "groq",
+  "baseUrl": "https://api.groq.com/openai/v1",
+  "model": "openai/gpt-oss-20b",
+  "apiKey": "",
+  "maxHistory": 16,
+  "enableHorrorEvents": true
+}
+```
+
+Вставь собственный ключ в `apiKey`. Ключ не включён в репозиторий или JAR и хранится только в локальном конфиге. Не публикуй конфиг с заполненным ключом.
+
+## Сборка из исходников
+
+Нужны JDK 21 и Gradle 8.14.3.
 
 ```bash
 cat source/verity-source-part-*.b64 | base64 --decode > Verity-Fabric-source.tar.xz
 xz -t Verity-Fabric-source.tar.xz
 tar -xJf Verity-Fabric-source.tar.xz
-```
-
-После распаковки открой каталог `VerityFabric`.
-
-## Сборка
-
-Требуются JDK 21 и Gradle 8.14.3.
-
-```bash
 cd VerityFabric
 gradle --no-daemon clean build
 ```
 
-Готовый remapped JAR: `build/libs/verity-fabric-0.1.0.jar`.
+Готовый JAR: `build/libs/verity-fabric-0.2.0.jar`.
 
-## Установка и настройка ИИ
+## Проверка ресурсов
 
-1. Установи Fabric Loader для Minecraft 1.21.8 и Fabric API соответствующей версии.
-2. Скачай JAR из [успешного Actions run](https://github.com/doniel1488-code/Verity-Fabric/actions/runs/43055005795) → Artifacts → `Verity-Fabric-Minecraft-1.21.8`.
-3. Помести JAR в `.minecraft/mods`.
-4. Запусти игру один раз и закрой её.
-5. Открой `.minecraft/config/verity-fabric.json` и заполни `apiKey` собственным ключом Groq.
+Скрипт `scripts/verify_resources.py` проверяет наличие переводов, корректность JSON, размеры PNG, OGG-звуки, ссылки звуковых событий и рецепт. GitHub Actions запускает эту проверку до компиляции и повторно проверяет ресурсы уже внутри собранного JAR.
 
-По умолчанию используется OpenAI-совместимый endpoint Groq и модель `openai/gpt-oss-20b`.
+## Статус
 
-**API-ключ не вшит в исходники, JAR или репозиторий.** Не публикуй конфиг с ключом, не отправляй его в issues и не добавляй в Git.
-
-## Управление
-
-- Используй предмет **Коробка Verity** по блоку, чтобы призвать спутника.
-- Нажми **V** рядом с Verity, чтобы открыть ИИ-чат.
-- Покорми Verity золотой морковью, чтобы восстановить доверие.
-- При низком доверии спутник может стать агрессивным; эту механику можно выключить в конфиге.
+Версия **0.2.0 — предварительный релиз**. Сборка и проверка ресурсов автоматизированы. Поведение сущности, анимации и реальные запросы к Groq необходимо дополнительно проверить в Minecraft 1.21.8.
 
 ## Лицензия
 
