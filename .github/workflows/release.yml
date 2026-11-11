@@ -13,7 +13,7 @@ jobs:
     name: Build and publish Verity 0.2.1 release
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout tagged source
+      - name: Checkout release source
         uses: actions/checkout@v6
 
       - name: Set up Java 21
