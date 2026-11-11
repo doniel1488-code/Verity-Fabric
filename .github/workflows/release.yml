@@ -2,15 +2,15 @@ name: Release Verity Fabric
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches: [main]
 
 permissions:
   contents: write
 
 jobs:
   release:
-    name: Build and publish tagged Verity release
+    if: contains(github.event.head_commit.message, '[publish-release]')
+    name: Build and publish Verity 0.2.1 release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout tagged source
@@ -36,6 +36,13 @@ jobs:
           xz -t /tmp/verity-fabric-source.tar.xz
           tar -xJf /tmp/verity-fabric-source.tar.xz -C .build-src
           test -f .build-src/VerityFabric/build.gradle
+          test -f .build-src/VerityFabric/src/main/java/ru/governix/verity/VerityMod.java
+
+      - name: Apply Verity 0.2.1 item-registration fix and validate source
+        shell: bash
+        run: |
+          set -euo pipefail
+          patch --batch --forward -p1 -d .build-src < source/patches/0002-fix-item-registry-key.patch
           python .build-src/VerityFabric/scripts/verify_resources.py --project .build-src/VerityFabric
 
       - name: Build remapped mod
@@ -45,7 +52,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR=".build-src/VerityFabric/build/libs/verity-fabric-0.2.0.jar"
+          JAR=".build-src/VerityFabric/build/libs/verity-fabric-0.2.1.jar"
           test -f "$JAR"
           python .build-src/VerityFabric/scripts/verify_resources.py --jar "$JAR"
           mkdir -p dist
@@ -54,12 +61,13 @@ jobs:
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: "Verity ${{ github.ref_name }} — Minecraft 1.21.8"
+          tag_name: v0.2.1
+          target_commitish: main
+          name: "Verity v0.2.1 — Minecraft 1.21.8"
           body: |
-            ## Verity ${{ github.ref_name }} — Fabric 1.21.8
+            ## Verity v0.2.1 — Fabric 1.21.8
 
-            Предварительный релиз. Сборка прошла компиляцию, remap и проверку ресурсов до и после упаковки в JAR.
+            Исправлен вылет при инициализации: для Коробки Verity теперь задаётся RegistryKey до создания Item.Settings-предмета. CI проверяет это условие, компиляцию, remap и ресурсы внутри JAR.
 
             В JAR входят русская и английская локализации, иконка мода, обычная и хоррор-текстуры, модель и текстура Коробки Verity, рецепт и четыре OGG-звука.
 
