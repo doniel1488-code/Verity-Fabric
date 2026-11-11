@@ -83,7 +83,7 @@ JAR прикрепляется к релизу автоматически пос
 Нужны JDK 21 и Gradle 8.14.3.
 
 ```bash
-cat source/verity-source-part-*.b64 | base64 --decode > Verity-Fabric-source.tar.xz
+cat source/verity-source-part-[0-9][0-9].b64 | base64 --decode > Verity-Fabric-source.tar.xz
 xz -t Verity-Fabric-source.tar.xz
 tar -xJf Verity-Fabric-source.tar.xz
 cd VerityFabric
