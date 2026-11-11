@@ -1,0 +1,54 @@
+--- a/VerityFabric/src/main/java/ru/governix/verity/VerityMod.java
++++ b/VerityFabric/src/main/java/ru/governix/verity/VerityMod.java
+@@ -41,6 +41,8 @@
+     public static final SoundEvent VERITY_HURT = registerSound("verity_hurt");
+     public static final SoundEvent VERITY_SPAWN = registerSound("verity_spawn");
+ 
++    private static final Identifier VERITY_BOX_ID = Identifier.of(MOD_ID, "verity_box");
++
+     private static SoundEvent registerSound(String path) {
+         Identifier id = Identifier.of(MOD_ID, path);
+         return Registry.register(Registries.SOUND_EVENT, id, SoundEvent.of(id));
+@@ -48,8 +50,10 @@
+ 
+     public static final Item VERITY_BOX = Registry.register(
+             Registries.ITEM,
+-            Identifier.of(MOD_ID, "verity_box"),
+-            new VerityBoxItem(new Item.Settings().maxCount(1))
++            VERITY_BOX_ID,
++            new VerityBoxItem(new Item.Settings()
++                    .registryKey(RegistryKey.of(RegistryKeys.ITEM, VERITY_BOX_ID))
++                    .maxCount(1))
+     );
+ 
+     @Override
+--- a/VerityFabric/gradle.properties
++++ b/VerityFabric/gradle.properties
+@@ -7,6 +7,6 @@
+ fabric_version=0.136.1+1.21.8
+ loom_version=1.11.8
+ 
+-mod_version=0.2.0
++mod_version=0.2.1
+ maven_group=ru.governix
+ archives_base_name=verity-fabric
+--- a/VerityFabric/scripts/verify_resources.py
++++ b/VerityFabric/scripts/verify_resources.py
+@@ -140,7 +140,16 @@
+         parser.error("pass exactly one of --project or --jar")
+ 
+     if args.project:
+-        root = args.project / "src/main/resources"
++        project = args.project
++        item_source = project / "src/main/java/ru/governix/verity/VerityMod.java"
++        item_code = item_source.read_text(encoding="utf-8")
++        required_registry_key = "registryKey(RegistryKey.of(RegistryKeys.ITEM, VERITY_BOX_ID))"
++        if required_registry_key not in item_code:
++            raise SystemExit("source: VerityBoxItem must receive an item RegistryKey before construction")
++        properties = (project / "gradle.properties").read_text(encoding="utf-8")
++        if "mod_version=0.2.1" not in properties.splitlines():
++            raise SystemExit("source: expected mod_version=0.2.1")
++        root = project / "src/main/resources"
+         names = {p.relative_to(root).as_posix() for p in root.rglob("*") if p.is_file()}
+         verify_files(lambda p: (root / p).read_bytes(), lambda p: (root / p).read_text(encoding="utf-8"), names, "source")
+     else:
