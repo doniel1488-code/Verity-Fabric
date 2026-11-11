@@ -1,46 +1,51 @@
 name: Release Verity Fabric
 
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_run:
+    workflows: ["Build Verity Fabric"]
+    types: [completed]
+    branches: [main]
 
 permissions:
+  actions: read
   contents: write
 
 jobs:
   release:
+    if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Set up Java 21
-        uses: actions/setup-java@v5
+      - name: Download verified JAR from the successful build
+        uses: actions/download-artifact@v7
         with:
-          distribution: temurin
-          java-version: '21'
-
-      - name: Set up Gradle 8.14.3
-        uses: gradle/actions/setup-gradle@v6
-        with:
-          gradle-version: '8.14.3'
-
-      - name: Restore source archive
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p .build-src
-          cat source/verity-source-part-*.b64 | base64 --decode > /tmp/verity-source.tar.xz
-          xz -t /tmp/verity-source.tar.xz
-          tar -xJf /tmp/verity-source.tar.xz -C .build-src
-          test -f .build-src/VerityFabric/build.gradle
-
-      - name: Build
-        run: gradle --no-daemon -p .build-src/VerityFabric clean build
+          name: Verity-Fabric-Minecraft-1.21.8
+          repository: ${{ github.repository }}
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: dist
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          generate_release_notes: true
-          files: .build-src/VerityFabric/build/libs/verity-fabric-*.jar
+          tag_name: v0.2.0
+          target_commitish: ${{ github.event.workflow_run.head_sha }}
+          name: "Verity 0.2.0 — Minecraft 1.21.8"
+          body: |
+            ## Verity 0.2.0 — Fabric 1.21.8
+
+            Предварительный релиз. Сборка прошла CI-компиляцию, remap и проверку упакованных ресурсов.
+
+            ### Включено
+            - Русская локализация интерфейса и английский резервный перевод.
+            - Иконка мода, текстура обычной Verity и хоррор-формы.
+            - Текстура и модель Коробки Verity.
+            - Четыре звуковых файла и регистрация звуковых событий.
+            - Рецепт крафта Коробки Verity.
+            - Диалог с ИИ через Groq API.
+
+            Требуется Minecraft Java 1.21.8, Fabric Loader и Fabric API для 1.21.8, Java 21.
+            Игровое тестирование на клиенте ещё требуется.
+          files: dist/verity-fabric-*.jar
+          fail_on_unmatched_files: true
+          overwrite_files: true
+          prerelease: true
