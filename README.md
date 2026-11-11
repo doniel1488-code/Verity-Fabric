@@ -4,9 +4,9 @@
 
 ## Скачать
 
-**[GitHub Release — Verity 0.2.0](https://github.com/doniel1488-code/Verity-Fabric/releases/tag/v0.2.0)**
+**[GitHub Release — Verity 0.2.1](https://github.com/doniel1488-code/Verity-Fabric/releases/tag/v0.2.1)**
 
-Прямой файл: [verity-fabric-0.2.0.jar](https://github.com/doniel1488-code/Verity-Fabric/releases/download/v0.2.0/verity-fabric-0.2.0.jar).
+Прямой файл: [verity-fabric-0.2.1.jar](https://github.com/doniel1488-code/Verity-Fabric/releases/download/v0.2.1/verity-fabric-0.2.1.jar).
 
 ## Требования
 
@@ -36,7 +36,7 @@
 
 1. Установи Fabric Loader для Minecraft 1.21.8.
 2. Установи Fabric API для Minecraft 1.21.8.
-3. Скачай JAR из раздела [Releases](https://github.com/doniel1488-code/Verity-Fabric/releases/tag/v0.2.0).
+3. Скачай JAR из раздела [Releases](https://github.com/doniel1488-code/Verity-Fabric/releases/tag/v0.2.1).
 4. Положи его в `.minecraft/mods`.
 5. Запусти игру один раз, чтобы мод создал конфигурацию.
 6. Выбери русский язык Minecraft, если нужен русский интерфейс.
@@ -93,6 +93,7 @@
 $b64 = (Get-ChildItem "source/v0.2.0/verified-chunks/part-*.b64" | Sort-Object Name | Get-Content -Raw) -join ""
 [IO.File]::WriteAllBytes("Verity-Fabric-source.tar.xz", [Convert]::FromBase64String($b64))
 tar -xJf Verity-Fabric-source.tar.xz
+git apply source/patches/0002-fix-item-registry-key.patch
 cd VerityFabric
 gradle --no-daemon clean build
 ```
@@ -111,11 +112,11 @@ gradle --no-daemon clean build
 
 ## Автоматические проверки
 
-GitHub Actions восстанавливает исходники, проверяет локализации, PNG-текстуры, модель предмета, рецепт и OGG-звуки, затем компилирует и remap-ит мод. После сборки те же проверки выполняются уже внутри JAR. Публикация будущих релизов запускается только по Git-тегу `v*`, чтобы не пытаться перезаписывать существующий Release при каждом push в `main`.
+GitHub Actions восстанавливает исходники, проверяет локализации, PNG-текстуры, модель предмета, рецепт и OGG-звуки, затем компилирует и remap-ит мод. После сборки те же проверки выполняются уже внутри JAR. Публикация релиза запускается отдельным commit message с маркером `[publish-release]`; workflow собирает JAR заново и создаёт тег/релиз после успешной проверки.
 
 ## Статус
 
-**0.2.0 — предварительный релиз.** Компиляция и проверка ресурсов прошли в GitHub Actions. Поведение сущности, анимации и реальные запросы Groq необходимо дополнительно протестировать непосредственно в клиенте Minecraft 1.21.8.
+**0.2.1 — предварительный релиз.** Исправлен вылет при регистрации Коробки Verity: `RegistryKey` задаётся до создания `Item`. CI проверяет это до компиляции и повторно проверяет ресурсы внутри JAR. Игровое поведение, анимации и реальные запросы Groq всё ещё требуют проверки в клиенте Minecraft 1.21.8.
 
 ## Лицензия
 
