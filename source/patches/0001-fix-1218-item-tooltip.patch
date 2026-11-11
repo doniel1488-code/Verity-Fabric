@@ -1,28 +1,29 @@
 --- a/src/main/java/ru/governix/verity/item/VerityBoxItem.java
 +++ b/src/main/java/ru/governix/verity/item/VerityBoxItem.java
-@@ -6,12 +6,14 @@
+@@ -4,14 +4,11 @@
+ import net.minecraft.entity.player.PlayerEntity;
+ import net.minecraft.item.Item;
  import net.minecraft.item.ItemUsageContext;
- import net.minecraft.item.ItemStack;
- import net.minecraft.item.tooltip.TooltipType;
-+import net.minecraft.component.type.TooltipDisplayComponent;
+-import net.minecraft.item.ItemStack;
+-import net.minecraft.item.tooltip.TooltipType;
  import net.minecraft.server.world.ServerWorld;
  import net.minecraft.util.ActionResult;
  import net.minecraft.util.math.BlockPos;
  import net.minecraft.sound.SoundCategory;
  import net.minecraft.text.Text;
- import java.util.List;
-+import java.util.function.Consumer;
+-import java.util.List;
  import net.minecraft.world.World;
  import ru.governix.verity.VerityMod;
  import ru.governix.verity.entity.VerityEntity;
-@@ -22,8 +24,8 @@
-     }
-
-     @Override
+@@ -19,11 +16,6 @@
+ public final class VerityBoxItem extends Item {
+     public VerityBoxItem(Settings settings) {
+         super(settings);
+-    }
+-
+-    @Override
 -    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType type) {
 -        tooltip.add(Text.translatable("item.verity.verity_box.tooltip"));
-+    public void appendTooltip(ItemStack stack, Item.TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> textConsumer, TooltipType type) {
-+        textConsumer.accept(Text.translatable("item.verity.verity_box.tooltip"));
      }
-
+ 
      @Override
