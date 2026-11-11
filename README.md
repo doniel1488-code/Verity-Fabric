@@ -1,12 +1,12 @@
-# Verity — Minecraft 1.21.8 · Fabric
+# Verity — Minecraft Java 1.21.8 · Fabric
 
-Клиентско-серверный Fabric-мод с ИИ-спутником Verity, диалогом через Groq API и постепенным переходом к хоррор-поведению.
+Неофициальный Fabric-мод с ИИ-спутником Verity. В обычной форме он дружелюбен к владельцу, но при низком доверии может перейти к хоррор-поведению.
 
 ## Скачать
 
-**[Релиз Verity 0.2.0](https://github.com/doniel1488-code/Verity-Fabric/releases/tag/v0.2.0)**
+**[Verity 0.2.0 — GitHub Release](https://github.com/doniel1488-code/Verity-Fabric/releases/tag/v0.2.0)**
 
-JAR прикрепляется к релизу автоматически после успешной сборки и проверки ресурсов в GitHub Actions. Пока релиз не опубликован, смотри [сборки Actions](https://github.com/doniel1488-code/Verity-Fabric/actions).
+Релиз публикуется автоматически только после успешной сборки, remap и проверки ресурсов внутри JAR. Пока Release не появился, можно посмотреть [GitHub Actions](https://github.com/doniel1488-code/Verity-Fabric/actions) и скачать артефакт успешной сборки.
 
 ## Требования
 
@@ -15,19 +15,19 @@ JAR прикрепляется к релизу автоматически пос
 - Fabric API для Minecraft 1.21.8.
 - Java **21**.
 - Собственный API-ключ Groq для ИИ-диалога.
-- Для мультиплеера мод должен быть установлен на Fabric-сервере и клиентах. Paper/Spigot не поддерживаются.
+- Для мультиплеера мод должен стоять на Fabric-сервере и у клиентов. Paper/Spigot не поддерживаются.
 
-## Возможности и ресурсы
+## Что входит в мод
 
-- Сущность Verity с обычной и хоррор-текстурой.
-- Иконка мода и собственная текстура Коробки Verity.
-- Модель предмета Коробки Verity и рецепт крафта.
-- Четыре OGG-звука: обычное окружение, окружение хоррор-формы, урон и призыв.
-- Полная русская локализация `ru_ru`; английский перевод `en_us` используется как резервный.
+- Иконка Verity в списке модов.
+- Текстура обычной Verity и отдельная демоническая текстура.
+- Коробка призыва: своя текстура, модель предмета и рецепт крафта.
+- Четыре OGG-звука: обычное окружение, хоррор-окружение, получение урона и призыв.
+- Русская локализация `ru_ru` и английская `en_us`.
 - Следование за владельцем, сохранение владельца и уровня доверия.
-- Диалоговое окно с памятью последних сообщений и контекстом мира.
-- Ответы ИИ через OpenAI-совместимый Groq API.
-- При доверии 20/100 и ниже Verity меняется и становится опасным. Эту механику можно отключить в конфиге.
+- Отдельное окно ИИ-чата с памятью последних сообщений и контекстом игрового мира.
+- Ответы через OpenAI-совместимый Groq API.
+- При доверии 20/100 и ниже Verity меняет форму и становится опасным. Механику можно отключить в конфиге.
 
 ## Установка
 
@@ -36,7 +36,7 @@ JAR прикрепляется к релизу автоматически пос
 3. Скачай `verity-fabric-0.2.0.jar` из [Releases](https://github.com/doniel1488-code/Verity-Fabric/releases/tag/v0.2.0).
 4. Положи JAR в папку `.minecraft/mods`.
 5. Запусти игру один раз, чтобы мод создал конфигурацию.
-6. В настройках Minecraft выбери язык **Русский**, чтобы интерфейс мода отображался на русском.
+6. В настройках Minecraft выбери язык **Русский**. Мод содержит `ru_ru`; при английском языке Minecraft использует `en_us`.
 7. Открой `.minecraft/config/verity-fabric.json`, укажи собственный Groq API-ключ в поле `apiKey`, сохрани файл и перезапусти игру.
 
 ## Управление
@@ -59,7 +59,7 @@ JAR прикрепляется к релизу автоматически пос
   Редстоун
 ```
 
-Рецепт также хранится в `data/verity/recipe/verity_box.json`.
+Точный рецепт: `data/verity/recipe/verity_box.json`.
 
 ## Настройка ИИ
 
@@ -82,8 +82,22 @@ JAR прикрепляется к релизу автоматически пос
 
 Нужны JDK 21 и Gradle 8.14.3.
 
+### Windows PowerShell
+
+Из корня репозитория:
+
+```powershell
+$b64 = (Get-ChildItem source/v0.2.0/chunks/part-*.b64 | Sort-Object Name | Get-Content -Raw) -join ""
+[IO.File]::WriteAllBytes("Verity-Fabric-source.tar.xz", [Convert]::FromBase64String($b64))
+tar -xJf Verity-Fabric-source.tar.xz
+cd VerityFabric
+gradle --no-daemon clean build
+```
+
+### Linux / macOS / Git Bash
+
 ```bash
-cat source/verity-source-part-01.b64 source/verity-source-part-02-repair/part-*.b64 source/verity-source-part-03.b64 source/verity-source-part-04.b64 source/verity-source-part-05.b64 source/verity-source-part-06.b64 source/verity-source-part-07.b64 source/verity-source-part-08.b64 source/verity-source-part-09.b64 source/verity-source-part-10.b64 source/verity-source-part-11.b64 source/verity-source-part-12.b64 source/verity-source-part-13.b64 source/verity-source-part-14.b64 | base64 --decode > Verity-Fabric-source.tar.xz
+cat source/v0.2.0/chunks/part-*.b64 | base64 --decode > Verity-Fabric-source.tar.xz
 xz -t Verity-Fabric-source.tar.xz
 tar -xJf Verity-Fabric-source.tar.xz
 cd VerityFabric
@@ -92,15 +106,21 @@ gradle --no-daemon clean build
 
 Готовый JAR: `build/libs/verity-fabric-0.2.0.jar`.
 
-GitHub Actions применяет тот же патч автоматически перед компиляцией.
-
 ## Проверка ресурсов
 
-Скрипт `scripts/verify_resources.py` проверяет наличие переводов, корректность JSON, размеры PNG, OGG-звуки, ссылки звуковых событий и рецепт. GitHub Actions запускает эту проверку до компиляции и повторно проверяет ресурсы уже внутри собранного JAR.
+Скрипт `scripts/verify_resources.py` проверяет:
+
+- обе локализации и необходимые переводные ключи;
+- PNG-текстуры и их размеры;
+- четыре OGG-файла;
+- JSON модели, звуков и рецепта;
+- ссылки звуковых событий на существующие файлы.
+
+GitHub Actions запускает проверку исходников до компиляции и повторно проверяет ресурсы уже внутри собранного JAR.
 
 ## Статус
 
-Версия **0.2.0 — предварительный релиз**. Сборка и проверка ресурсов автоматизированы. Поведение сущности, анимации и реальные запросы к Groq необходимо дополнительно проверить в Minecraft 1.21.8.
+**0.2.0 — предварительный релиз.** Компиляция и проверка ресурсов автоматизированы; призыв, поведение, анимации, звуки и реальные запросы к Groq нужно дополнительно проверить в клиенте Minecraft 1.21.8.
 
 ## Лицензия
 
